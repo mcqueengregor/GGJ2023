@@ -41,7 +41,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
     private BoxCollider2D boxCollider;
     private SpriteRenderer spriteRenderer;
-    private Camera mainCam;
+    //private Camera mainCam;
     private Vector2 originalPos;
 
     private bool isMoving = false;  // 'true' if user is pressing A or S
@@ -63,7 +63,7 @@ public class PlayerController : MonoBehaviour
         boxCollider = GetComponent<BoxCollider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
-        mainCam = Camera.main;
+        //mainCam = Camera.main;
         originalPos = transform.position;
     }
 
@@ -82,9 +82,9 @@ public class PlayerController : MonoBehaviour
         }
 
         // Make camera follow the player:
-        Vector3 newCamPos = mainCam.transform.position;
-        newCamPos.x = transform.position.x;
-        mainCam.transform.position = newCamPos;
+        //Vector3 newCamPos = mainCam.transform.position;
+        //newCamPos.x = transform.position.x;
+        //mainCam.transform.position = newCamPos;
 
         // If player is recoiling, check if they should stop:
         if (playerState == PlayerState.RECOIL)
