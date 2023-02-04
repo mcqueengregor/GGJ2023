@@ -21,6 +21,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float jumpStrength = 1.0f;  // Multiplier for below 'jumpHeight' value.
     const float jumpHeight = 5.0f;
+    [SerializeField] [Range(1.0f, 10.0f)]
+    private float gravityStrength = 1.0f;
 
     private Rigidbody2D rb;
     private BoxCollider2D boxCollider;
@@ -68,6 +70,10 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
             Jump();
 
+        // If falling, adjust gravity's strength:
+        if (rb.velocity.y < -0.1f)
+            rb.gravityScale = gravityStrength;
+
         // Make camera follow the player:
         Vector3 newCamPos = cam.transform.position;
         newCamPos.x = transform.position.x;
@@ -100,8 +106,8 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-            // Figure out decel speed based on whether player is moving left or right:
-            float decelSpeed = rb.velocity.x > 0.0f ? -decelRate : decelRate;
+        // Figure out decel speed based on whether player is moving left or right:
+        float decelSpeed = rb.velocity.x > 0.0f ? -decelRate : decelRate;
         rb.velocity += new Vector2(decelSpeed, 0.0f);
     }
 
@@ -115,6 +121,9 @@ public class PlayerController : MonoBehaviour
         // Prevent player from jumping if they aren't on the ground:
         if (Physics2D.Raycast(o, Vector2.down, rayLength))
             rb.velocity = new Vector2(rb.velocity.x, jumpHeight * jumpStrength);
+
+        // Reset gravity's strength while going up:
+        rb.gravityScale = 1.0f;
 
         Debug.DrawLine(o, o + Vector2.down * rayLength, Color.green, 0.25f);
     }
