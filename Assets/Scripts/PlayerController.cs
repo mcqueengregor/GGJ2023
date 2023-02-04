@@ -157,6 +157,9 @@ public class PlayerController : MonoBehaviour
         // Mark player as moving in this frame:
         isMoving = true;
         ChangePlayerState(PlayerState.MOVING);
+
+        // Flip rabbit sprite to face the right way:
+        spriteRenderer.flipX = horiVelocityChange < 0f;
     }
 
     private void DeceleratePlayer()
@@ -244,15 +247,13 @@ public class PlayerController : MonoBehaviour
                     Debug.LogWarning("Switch statement shouldn't have reached this point :thonk:");
                     break;
             }
-
-            // TODO: Switch active sprite animation here!
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         // If player collides with an enemy, make player recoil:
-        if (collision.gameObject.CompareTag("EnemyObject"))
+        if (collision.gameObject.CompareTag("Enemy"))
         {
             ChangePlayerState(PlayerState.RECOIL);
             recoilTimer = 0.0f;
