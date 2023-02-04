@@ -2013,7 +2013,7 @@ MonoBehaviour:
   horiSpeedDeadZone: 0.1
   jumpStrength: 1.1
   gravityStrength: 1.75
-  recoilStrength: 1
+  recoilStrength: 50
   recoilDuration: 1.5
 --- !u!1 &733191918
 GameObject:

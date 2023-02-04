@@ -16,6 +16,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] [Range(0.0f, 1.0f)] 
     private float horiSpeedDeadZone = 0.1f; // Quickly stop player from moving if their speed is
                                             // between this range (prevents jittering while stationary).
+    public float beltPush = 0.0f;           // How much the player is being pushed by a conveyor belt
+                                            // (adjusted by external conveyor belt script).
 
     [Header("Jumping:")]
     [SerializeField]
@@ -25,8 +27,8 @@ public class PlayerController : MonoBehaviour
     private float gravityStrength = 1.0f;   // Rigid body's gravity strength, set while falling.
 
     [Header("Recoil:")]
-    [SerializeField] [Range(0.0f, 5.0f)]
-    private float recoilStrength = 1.0f;    // The strength of the force that moves the
+    [SerializeField]
+    private float recoilStrength = 50.0f;   // The strength of the force that moves the
                                             // player when they collide with an enemy.
     [SerializeField] [Range(0.1f, 2.0f)]
     private float recoilDuration = 1.5f;    // The amount of time the player recoils for, in seconds.
@@ -68,9 +70,13 @@ public class PlayerController : MonoBehaviour
         isMoving = false;   // Assume user isn't pressing movement keys until we check for it.
 
         // If player falls off level, teleport them back to start:
-        // TODO: Make this go to "GAME OVER" screen, if we're using that!
+        // TODO: Make this go to "GAME OVER" screen!
         if (transform.position.y < -4.0f)
+        {
+            ChangePlayerState(PlayerState.IDLE);
+            rb.velocity = Vector2.zero;
             transform.position = originalPos;
+        }
 
         // Make camera follow the player:
         Vector3 newCamPos = mainCam.transform.position;
@@ -81,12 +87,17 @@ public class PlayerController : MonoBehaviour
         if (playerState == PlayerState.RECOIL)
         {
             // If player has recoiled for long enough, make them stop recoiling:
-            if (recoilTimer <= recoilDuration)
+            if (recoilTimer >= recoilDuration)
+            {
                 ChangePlayerState(PlayerState.IDLE);
+                rb.velocity = new Vector2(0.0f, rb.velocity.y);
+            }
             else
             {
                 // If player should still recoil, increment timer and skip below logic:
                 recoilTimer += Time.deltaTime;
+                Debug.Log("Player recoiling (" + recoilTimer.ToString("F2") + "/"
+                    + recoilDuration.ToString("F2") + ")...");
                 return;
             }
         }
@@ -193,8 +204,9 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("EnemyObject"))
         {
             ChangePlayerState(PlayerState.RECOIL);
+            recoilTimer = 0.0f;
 
-            Vector2 forceDir = new Vector2(-1.0f, 0.25f);
+            Vector2 forceDir = new Vector2(-0.25f, 1.0f);
             forceDir.Normalize();
 
             rb.AddForce(forceDir * recoilStrength, ForceMode2D.Impulse);
