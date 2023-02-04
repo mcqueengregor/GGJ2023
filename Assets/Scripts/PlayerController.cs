@@ -80,7 +80,8 @@ public class PlayerController : MonoBehaviour
         {
             ChangePlayerState(PlayerState.IDLE);
             rb.velocity = Vector2.zero;
-            transform.position = new Vector3(mainCam.transform.position.x,originalPos.y);
+            transform.position = new Vector3(mainCam.transform.position.x, originalPos.y);
+            gameObject.GetComponent<PlayerHealth>().DamagePlayer(1);
         }
 
         // Make camera follow the player:
