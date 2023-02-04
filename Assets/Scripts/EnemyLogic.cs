@@ -30,6 +30,9 @@ public class EnemyLogic : MonoBehaviour
         Target2 = GameObject.FindGameObjectWithTag("EnemyTarget2");
 
         StartTarg = new Vector3(Random.Range(Target1.transform.position.x, Target2.transform.position.x), Random.Range(Target1.transform.position.y, Target2.transform.position.y), Random.Range(Target1.transform.position.z, Target2.transform.position.z));
+
+        Vector2 S = gameObject.GetComponent<SpriteRenderer>().sprite.bounds.size;
+        gameObject.GetComponent<BoxCollider2D>().size = S;
     }
 
     // Update is called once per frame
