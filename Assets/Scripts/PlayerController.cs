@@ -16,21 +16,33 @@ public class PlayerController : MonoBehaviour
     [SerializeField] [Range(0.0f, 1.0f)] 
     private float horiSpeedDeadZone = 0.1f; // Quickly stop player from moving if their speed is
                                             // between this range (prevents jittering while stationary).
+    public float beltPush = 0.0f;           // How much the player is being pushed by a conveyor belt
+                                            // (adjusted by external conveyor belt script).
 
     [Header("Jumping:")]
     [SerializeField]
-    private float jumpStrength = 1.0f;  // Multiplier for below 'jumpHeight' value.
+    private float jumpStrength = 1.0f;      // Scalar for below 'jumpHeight' value.
     const float jumpHeight = 5.0f;
-    [SerializeField] [Range(1.0f, 10.0f)]
-    private float gravityStrength = 1.0f;
+    [SerializeField] [Range(0.0f, 5.0f)]
+    private float gravityStrength = 1.0f;   // Rigid body's gravity strength, set while falling.
 
+    [Header("Recoil:")]
+    [SerializeField]
+    private float recoilStrength = 50.0f;   // The strength of the force that moves the
+                                            // player when they collide with an enemy.
+    [SerializeField] [Range(0.1f, 2.0f)]
+    private float recoilDuration = 1.5f;    // The amount of time the player recoils for, in seconds.
+    private float recoilTimer = 0.0f;       // Tracks how long the player has recoiled for, in seconds.
+
+    // Misc:
     private Rigidbody2D rb;
     private BoxCollider2D boxCollider;
+    private SpriteRenderer spriteRenderer;
+    private Camera mainCam;
+    private Vector2 originalPos;
 
     private bool isMoving = false;  // 'true' if user is pressing A or S
                                     // to move left or right, 'false' otherwise.
-
-    Camera cam;
 
     private enum PlayerState { 
         IDLE    = 0,
@@ -41,14 +53,15 @@ public class PlayerController : MonoBehaviour
     } 
     PlayerState playerState = PlayerState.IDLE;
 
-
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         boxCollider = GetComponent<BoxCollider2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
 
-        cam = Camera.main;
+        mainCam = Camera.main;
+        originalPos = transform.position;
     }
 
     // Update is called once per frame
@@ -56,7 +69,40 @@ public class PlayerController : MonoBehaviour
     {
         isMoving = false;   // Assume user isn't pressing movement keys until we check for it.
 
-        // Movement logic:
+        // If player falls off level, teleport them back to start:
+        // TODO: Make this go to "GAME OVER" screen!
+        if (transform.position.y < -4.0f)
+        {
+            ChangePlayerState(PlayerState.IDLE);
+            rb.velocity = Vector2.zero;
+            transform.position = originalPos;
+        }
+
+        // Make camera follow the player:
+        Vector3 newCamPos = mainCam.transform.position;
+        newCamPos.x = transform.position.x;
+        mainCam.transform.position = newCamPos;
+
+        // If player is recoiling, check if they should stop:
+        if (playerState == PlayerState.RECOIL)
+        {
+            // If player has recoiled for long enough, make them stop recoiling:
+            if (recoilTimer >= recoilDuration)
+            {
+                ChangePlayerState(PlayerState.IDLE);
+                rb.velocity = new Vector2(0.0f, rb.velocity.y);
+            }
+            else
+            {
+                // If player should still recoil, increment timer and skip below logic:
+                recoilTimer += Time.deltaTime;
+                Debug.Log("Player recoiling (" + recoilTimer.ToString("F2") + "/"
+                    + recoilDuration.ToString("F2") + ")...");
+                return;
+            }
+        }
+
+        // Movement logic (blocked if recoiling):
         if (Input.GetKey(KeyCode.A))
             MovePlayer(-accelRate);
         if (Input.GetKey(KeyCode.D))
@@ -66,18 +112,16 @@ public class PlayerController : MonoBehaviour
         if (!isMoving)
             DeceleratePlayer();
 
-        // Jump logic:
+        // Jump logic (blocked if recoiling):
         if (Input.GetKeyDown(KeyCode.Space))
             Jump();
 
-        // If falling, adjust gravity's strength:
+        // If falling and not recoiling from attack, adjust gravity's strength:
         if (rb.velocity.y < -0.1f)
+        {
+            ChangePlayerState(PlayerState.FALLING);
             rb.gravityScale = gravityStrength;
-
-        // Make camera follow the player:
-        Vector3 newCamPos = cam.transform.position;
-        newCamPos.x = transform.position.x;
-        cam.transform.position = newCamPos;
+        }
     }
 
     private void MovePlayer(float horiVelocityChange)
@@ -96,7 +140,7 @@ public class PlayerController : MonoBehaviour
 
     private void DeceleratePlayer()
     {
-        // Only decelerate player if they're actually moving:
+        // Only decelerate player if they're actually moving, otherwise early-out:
         if (FloatWithinRange(rb.velocity.x, -horiSpeedDeadZone, horiSpeedDeadZone))
         {
             // If player isn't jumping, falling or recoiling, update state to IDLE:
@@ -115,15 +159,18 @@ public class PlayerController : MonoBehaviour
     {
         // Ray origin (set to bottom of player's box collider):
         Vector2 o = new Vector2(boxCollider.transform.position.x, boxCollider.transform.position.y)
-            + new Vector2(0.0f, -boxCollider.size.y / 2.0f);
+            + new Vector2(0.0f, (-boxCollider.size.y / 2.0f) * transform.localScale.y);
         const float rayLength = 0.1f;
-        
-        // Prevent player from jumping if they aren't on the ground:
-        if (Physics2D.Raycast(o, Vector2.down, rayLength))
-            rb.velocity = new Vector2(rb.velocity.x, jumpHeight * jumpStrength);
 
-        // Reset gravity's strength while going up:
-        rb.gravityScale = 1.0f;
+        // Prevent player from jumping if they aren't on the ground (blocked if recoiling)::
+        if (Physics2D.Raycast(o, Vector2.down, rayLength))
+        {
+            rb.velocity = new Vector2(rb.velocity.x, jumpHeight * jumpStrength);
+            
+            // Reset gravity's strength while going up:
+            rb.gravityScale = 1.0f;
+            ChangePlayerState(PlayerState.JUMPING);
+        }
 
         Debug.DrawLine(o, o + Vector2.down * rayLength, Color.green, 0.25f);
     }
@@ -141,7 +188,30 @@ public class PlayerController : MonoBehaviour
 
     void ChangePlayerState(PlayerState newState)
     {
-        playerState = newState;
-        // TODO: Switch active sprite animation here!
+        // Avoid overprinting to console:
+        if (playerState != newState)
+        {
+            playerState = newState;
+            Debug.Log("Changed " + name + "'s state to " + playerState + "!");
+            
+            // TODO: Switch active sprite animation here!
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        // If player collides with an enemy, make player recoil:
+        if (collision.gameObject.CompareTag("EnemyObject"))
+        {
+            ChangePlayerState(PlayerState.RECOIL);
+            recoilTimer = 0.0f;
+
+            Vector2 forceDir = new Vector2(-0.25f, 1.0f);
+            forceDir.Normalize();
+
+            rb.AddForce(forceDir * recoilStrength, ForceMode2D.Impulse);
+
+            Debug.Log("Player hit enemy!");
+        }
     }
 }
