@@ -41,7 +41,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
     private BoxCollider2D boxCollider;
     private SpriteRenderer spriteRenderer;
-    //private Camera mainCam;
+    private Camera mainCam;
     private Vector2 originalPos;
     private Animator animator;
 
@@ -65,7 +65,7 @@ public class PlayerController : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
 
-        //mainCam = Camera.main;
+        mainCam = Camera.main;
         originalPos = transform.position;
     }
 
@@ -80,7 +80,8 @@ public class PlayerController : MonoBehaviour
         {
             ChangePlayerState(PlayerState.IDLE);
             rb.velocity = Vector2.zero;
-            transform.position = originalPos;
+            transform.position = new Vector3(mainCam.transform.position.x, originalPos.y);
+            gameObject.GetComponent<PlayerHealth>().DamagePlayer(1);
         }
 
         // Make camera follow the player:
