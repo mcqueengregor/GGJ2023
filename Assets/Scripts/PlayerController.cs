@@ -21,16 +21,21 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float jumpStrength = 1.0f;  // Multiplier for below 'jumpHeight' value.
     const float jumpHeight = 5.0f;
-    [SerializeField] [Range(1.0f, 10.0f)]
+    [SerializeField] [Range(0.0f, 5.0f)]
     private float gravityStrength = 1.0f;
 
+    [Header("Recoil:")]
+    [SerializeField] [Range(0.0f, 5.0f)]
+    private float recoilStrength = 1.0f;    // The strength of the force that moves the
+                                            // player when they collide with an enemy.
+
+    // Misc:
     private Rigidbody2D rb;
     private BoxCollider2D boxCollider;
+    private Camera mainCam;
 
     private bool isMoving = false;  // 'true' if user is pressing A or S
                                     // to move left or right, 'false' otherwise.
-
-    Camera cam;
 
     private enum PlayerState { 
         IDLE    = 0,
@@ -41,14 +46,13 @@ public class PlayerController : MonoBehaviour
     } 
     PlayerState playerState = PlayerState.IDLE;
 
-
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         boxCollider = GetComponent<BoxCollider2D>();
 
-        cam = Camera.main;
+        mainCam = Camera.main;
     }
 
     // Update is called once per frame
@@ -56,28 +60,34 @@ public class PlayerController : MonoBehaviour
     {
         isMoving = false;   // Assume user isn't pressing movement keys until we check for it.
 
-        // Movement logic:
-        if (Input.GetKey(KeyCode.A))
-            MovePlayer(-accelRate);
-        if (Input.GetKey(KeyCode.D))
-            MovePlayer(accelRate);
+        // Movement logic (block while recoiling):
+        if (playerState != PlayerState.RECOIL)
+        {
+            if (Input.GetKey(KeyCode.A))
+                MovePlayer(-accelRate);
+            if (Input.GetKey(KeyCode.D))
+                MovePlayer(accelRate);
+        }
 
         // Deccelerate player's horizontal speed, if user isn't pressing movement keys:
         if (!isMoving)
             DeceleratePlayer();
 
-        // Jump logic:
-        if (Input.GetKeyDown(KeyCode.Space))
+        // Jump logic (block while recoiling):
+        if (Input.GetKeyDown(KeyCode.Space) && playerState != PlayerState.RECOIL)
             Jump();
 
-        // If falling, adjust gravity's strength:
-        if (rb.velocity.y < -0.1f)
+        // If falling and not recoiling from attack, adjust gravity's strength:
+        if (rb.velocity.y < -0.1f && playerState != PlayerState.RECOIL)
+        {
+            ChangePlayerState(PlayerState.FALLING);
             rb.gravityScale = gravityStrength;
+        }
 
         // Make camera follow the player:
-        Vector3 newCamPos = cam.transform.position;
+        Vector3 newCamPos = mainCam.transform.position;
         newCamPos.x = transform.position.x;
-        cam.transform.position = newCamPos;
+        mainCam.transform.position = newCamPos;
     }
 
     private void MovePlayer(float horiVelocityChange)
@@ -96,7 +106,7 @@ public class PlayerController : MonoBehaviour
 
     private void DeceleratePlayer()
     {
-        // Only decelerate player if they're actually moving:
+        // Only decelerate player if they're actually moving, otherwise early-out:
         if (FloatWithinRange(rb.velocity.x, -horiSpeedDeadZone, horiSpeedDeadZone))
         {
             // If player isn't jumping, falling or recoiling, update state to IDLE:
@@ -115,15 +125,18 @@ public class PlayerController : MonoBehaviour
     {
         // Ray origin (set to bottom of player's box collider):
         Vector2 o = new Vector2(boxCollider.transform.position.x, boxCollider.transform.position.y)
-            + new Vector2(0.0f, -boxCollider.size.y / 2.0f);
+            + new Vector2(0.0f, (-boxCollider.size.y / 2.0f) * transform.localScale.y);
         const float rayLength = 0.1f;
-        
-        // Prevent player from jumping if they aren't on the ground:
-        if (Physics2D.Raycast(o, Vector2.down, rayLength))
-            rb.velocity = new Vector2(rb.velocity.x, jumpHeight * jumpStrength);
 
-        // Reset gravity's strength while going up:
-        rb.gravityScale = 1.0f;
+        // Prevent player from jumping if they aren't on the ground (block if recoiling):
+        if (Physics2D.Raycast(o, Vector2.down, rayLength) && playerState != PlayerState.RECOIL)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, jumpHeight * jumpStrength);
+            
+            // Reset gravity's strength while going up:
+            rb.gravityScale = 1.0f;
+            ChangePlayerState(PlayerState.JUMPING);
+        }
 
         Debug.DrawLine(o, o + Vector2.down * rayLength, Color.green, 0.25f);
     }
@@ -143,5 +156,19 @@ public class PlayerController : MonoBehaviour
     {
         playerState = newState;
         // TODO: Switch active sprite animation here!
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        // If player collides with an enemy, make player recoil:
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            ChangePlayerState(PlayerState.RECOIL);
+
+            Vector2 forceDir = new Vector2(1.0f, 0.25f);
+            forceDir.Normalize();
+
+            rb.AddForce(forceDir * recoilStrength, ForceMode2D.Impulse); ;
+        }
     }
 }
