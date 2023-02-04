@@ -8,6 +8,9 @@ public class MainMenu : MonoBehaviour
     public static bool gameIsPaused = false;
     public GameObject PauseMenuUI;
 
+    public static float musicVolume {get; private set;}
+    public static float soundVolume {get; private set;}
+
     // Update is called once per frame
     void Update()
     {
@@ -17,7 +20,7 @@ public class MainMenu : MonoBehaviour
             {
                 Resume();
             }
-            else //if gameIsPaused it false, then pause gameplay
+            else //if gameIsPaused is false, then pause gameplay
             {
                 Pause();
             }
@@ -48,9 +51,19 @@ public class MainMenu : MonoBehaviour
     public void StartGame()
     {
         //Chanages from the Main menu to start the game
-        //SceneManager.LoadScene("Main Prototype");
         Debug.Log("Start has been selected.");
     }
 
-    
+        //change volume for music on slider value change
+    public void onMusicSliderVolumeChange(float value)
+    {
+        musicVolume = value;
+        //AudioManager.Instance.UpdateMixerVolume();
+    }
+
+    //change volume for sfx on slider value change
+    public void onSoundSliderVolumeChange(float value)
+    {
+        soundVolume = value;
+    }
 }
