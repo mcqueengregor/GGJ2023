@@ -5,21 +5,28 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour
 {
     //public GameObject[] Enemies;
+    [Header("Enemy Prefab Setting")]
     public GameObject Enemy;
-    public GameObject Spawner;
-    
-    
+    //public GameObject Spawner;
+
+    [Header("Spawn Area Limits")]
     public Transform AreaSpawn1;
     public Transform AreaSpawn2;
 
-
+    [Header("Max Enemies on Screen")]
     public float MaxEnemScreen = 1;
+    [Header("Amount Able to Spawn at the Same Time")]
     public float MaxSameSpawnLimit = 1;
-    public float SpawnTimer = 2;
-    public float MaxTime = 5;
-    public float MinTime = 1;
 
-    public bool Spawned = false;
+
+    private float SpawnTimer = 2;
+
+    [Header("Spawn Timers")]
+    public float MinTime = 1;
+    public float MaxTime = 5;
+    
+
+    private bool Spawned = false;
 
 
     // Start is called before the first frame update
@@ -38,8 +45,7 @@ public class EnemySpawner : MonoBehaviour
 
     void SpawnEnem()
     {
-        Spawned = true;
-        print("done");
+        //Spawned = true;
         var SpawnPosition = new Vector3(Random.Range(AreaSpawn1.position.x, AreaSpawn2.position.x), Random.Range(AreaSpawn1.position.y, AreaSpawn2.position.y), Random.Range(AreaSpawn1.position.z, AreaSpawn2.position.z));
         GameObject Clone = Instantiate(Enemy, SpawnPosition, Quaternion.identity);
         SpawnTimer = Random.Range(MinTime, MaxTime);

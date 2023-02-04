@@ -4,14 +4,17 @@ using UnityEngine;
 
 public class EnemyLogic : MonoBehaviour
 {
-    public SpriteRenderer EnemBase;
+    
+    private SpriteRenderer EnemBase;
+    [Header("Enemy Sprites")]
     public Sprite[] Sprites;
 
+    [Header("Speed")]
     public float Speed = 2;
 
-    public Vector3 EndTarg;
-    public GameObject Target1;
-    public GameObject Target2;
+    private Vector3 EndTarg;
+    private GameObject Target1;
+    private GameObject Target2;
 
 
     // Start is called before the first frame update
