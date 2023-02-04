@@ -12,7 +12,10 @@ public class EnemyLogic : MonoBehaviour
     [Header("Speed")]
     public float Speed = 2;
 
+    private Vector3 StartTarg;
     private Vector3 EndTarg;
+    
+
     private GameObject Target1;
     private GameObject Target2;
 
@@ -25,14 +28,21 @@ public class EnemyLogic : MonoBehaviour
         
         Target1 = GameObject.FindGameObjectWithTag("EnemyTarget1");
         Target2 = GameObject.FindGameObjectWithTag("EnemyTarget2");
-        EndTarg = new Vector3(Random.Range(Target1.transform.position.x, Target2.transform.position.x), Random.Range(Target1.transform.position.y, Target2.transform.position.y), Random.Range(Target1.transform.position.z, Target2.transform.position.z));
-        
+
+        StartTarg = new Vector3(Random.Range(Target1.transform.position.x, Target2.transform.position.x), Random.Range(Target1.transform.position.y, Target2.transform.position.y), Random.Range(Target1.transform.position.z, Target2.transform.position.z));
     }
 
     // Update is called once per frame
     void Update()
     {
+        EndTarg = new Vector3(Random.Range(Target1.transform.position.x, Target2.transform.position.x), StartTarg.y, Random.Range(Target1.transform.position.z, Target2.transform.position.z));
+
         //transform.LookAt(EndTarg);
         transform.position = Vector3.MoveTowards(transform.position, EndTarg, (Speed * Time.deltaTime));
+
+        if(gameObject.transform.position == EndTarg)
+        {
+            Destroy(gameObject);
+        }
     }
 }
