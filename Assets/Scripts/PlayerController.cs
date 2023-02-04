@@ -16,8 +16,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] [Range(0.0f, 1.0f)] 
     private float horiSpeedDeadZone = 0.1f; // Quickly stop player from moving if their speed is
                                             // between this range (prevents jittering while stationary).
+    [HideInInspector]
     public float beltPush = 0.0f;           // How much the player is being pushed by a conveyor belt
                                             // (adjusted by external conveyor belt script).
+    const float beltEpsilon = 0.1f;         // Used if beltPush ~= accelRate, so that the player can
+                                            // eventually overpower the belt they're moving on.
 
     [Header("Jumping:")]
     [SerializeField]
@@ -112,6 +115,13 @@ public class PlayerController : MonoBehaviour
         if (!isMoving)
             DeceleratePlayer();
 
+        // Take the conveyor belt's influence on the player into account:
+        // NOTE: This could make the player unable to move in one direction and
+        // incredibly fast in the other direction, be careful!
+        rb.velocity += new Vector2(beltPush, 0.0f);
+
+        Debug.Log("After belt push: " + rb.velocity);
+
         // Jump logic (blocked if recoiling):
         if (Input.GetKeyDown(KeyCode.Space))
             Jump();
@@ -126,12 +136,23 @@ public class PlayerController : MonoBehaviour
 
     private void MovePlayer(float horiVelocityChange)
     {
+        // If beltPush and horiVelocity change are close enough to equal, make
+        // horiVelocityChange a little higher so that player can outrun belt:
+        if (FloatEqual(beltPush, -horiVelocityChange, 0.1f))
+        {
+            float epsilon = horiVelocityChange > 0f ? beltEpsilon : -beltEpsilon;
+            horiVelocityChange += epsilon;
+            Debug.Log("New change: " + horiVelocityChange);
+        }
+
         rb.velocity += new Vector2(horiVelocityChange, 0.0f);
-        
+
         // Prevent player's speed from exceeding max value:
         rb.velocity = new Vector2(
-            Mathf.Clamp(rb.velocity.x, -maxHorizontalSpeed, maxHorizontalSpeed),
-            rb.velocity.y);
+        Mathf.Clamp(rb.velocity.x, -maxHorizontalSpeed, maxHorizontalSpeed),
+        rb.velocity.y);
+
+        Debug.Log("After move: " + rb.velocity);
 
         // Mark player as moving in this frame:
         isMoving = true;
@@ -143,6 +164,9 @@ public class PlayerController : MonoBehaviour
         // Only decelerate player if they're actually moving, otherwise early-out:
         if (FloatWithinRange(rb.velocity.x, -horiSpeedDeadZone, horiSpeedDeadZone))
         {
+            if (!FloatEqual(beltPush, 0.0f))
+                rb.velocity = new Vector2(0.0f, rb.velocity.y);
+
             // If player isn't jumping, falling or recoiling, update state to IDLE:
             if (playerState == PlayerState.MOVING)
                 ChangePlayerState(PlayerState.IDLE);
