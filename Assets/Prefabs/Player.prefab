@@ -55,7 +55,7 @@ MonoBehaviour:
   beltPush: 0
   jumpStrength: 1
   gravityStrength: 1
-  recoilStrength: 50
+  recoilStrength: 5
   recoilDuration: 1.5
 --- !u!212 &3643129723705179386
 SpriteRenderer:
