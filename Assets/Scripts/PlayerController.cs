@@ -21,21 +21,34 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float jumpStrength = 1.0f;  // Multiplier for below 'jumpHeight' value.
     const float jumpHeight = 5.0f;
+    [SerializeField] [Range(1.0f, 10.0f)]
+    private float gravityStrength = 1.0f;
 
     private Rigidbody2D rb;
     private BoxCollider2D boxCollider;
 
-    private bool isGrounded = true;
-    private bool isFalling = false;
-
     private bool isMoving = false;  // 'true' if user is pressing A or S
                                     // to move left or right, 'false' otherwise.
+
+    Camera cam;
+
+    private enum PlayerState { 
+        IDLE    = 0,
+        MOVING  = 1,
+        JUMPING = 2,
+        FALLING = 3,
+        RECOIL  = 4     // When player has collided with enemy (blocks input and getting damaged more).
+    } 
+    PlayerState playerState = PlayerState.IDLE;
+
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         boxCollider = GetComponent<BoxCollider2D>();
+
+        cam = Camera.main;
     }
 
     // Update is called once per frame
@@ -56,6 +69,15 @@ public class PlayerController : MonoBehaviour
         // Jump logic:
         if (Input.GetKeyDown(KeyCode.Space))
             Jump();
+
+        // If falling, adjust gravity's strength:
+        if (rb.velocity.y < -0.1f)
+            rb.gravityScale = gravityStrength;
+
+        // Make camera follow the player:
+        Vector3 newCamPos = cam.transform.position;
+        newCamPos.x = transform.position.x;
+        cam.transform.position = newCamPos;
     }
 
     private void MovePlayer(float horiVelocityChange)
@@ -69,13 +91,20 @@ public class PlayerController : MonoBehaviour
 
         // Mark player as moving in this frame:
         isMoving = true;
+        ChangePlayerState(PlayerState.MOVING);
     }
 
     private void DeceleratePlayer()
     {
         // Only decelerate player if they're actually moving:
         if (FloatWithinRange(rb.velocity.x, -horiSpeedDeadZone, horiSpeedDeadZone))
+        {
+            // If player isn't jumping, falling or recoiling, update state to IDLE:
+            if (playerState == PlayerState.MOVING)
+                ChangePlayerState(PlayerState.IDLE);
+
             return;
+        }
 
         // Figure out decel speed based on whether player is moving left or right:
         float decelSpeed = rb.velocity.x > 0.0f ? -decelRate : decelRate;
@@ -93,6 +122,9 @@ public class PlayerController : MonoBehaviour
         if (Physics2D.Raycast(o, Vector2.down, rayLength))
             rb.velocity = new Vector2(rb.velocity.x, jumpHeight * jumpStrength);
 
+        // Reset gravity's strength while going up:
+        rb.gravityScale = 1.0f;
+
         Debug.DrawLine(o, o + Vector2.down * rayLength, Color.green, 0.25f);
     }
 
@@ -105,5 +137,11 @@ public class PlayerController : MonoBehaviour
     bool FloatWithinRange(float val, float rangeMin, float rangeMax)
     {
         return val >= rangeMin && val <= rangeMax;
+    }
+
+    void ChangePlayerState(PlayerState newState)
+    {
+        playerState = newState;
+        // TODO: Switch active sprite animation here!
     }
 }
