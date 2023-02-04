@@ -17,6 +17,11 @@ public class PlayerController : MonoBehaviour
     private float horiSpeedDeadZone = 0.1f; // Quickly stop player from moving if their speed is
                                             // between this range (prevents jittering while stationary).
 
+    [Header("Jumping:")]
+    [SerializeField]
+    private float jumpStrength = 1.0f;  // Multiplier for below 'jumpHeight' value.
+    const float jumpHeight = 5.0f;
+
     private Rigidbody2D rb;
     private BoxCollider2D boxCollider;
 
@@ -61,6 +66,8 @@ public class PlayerController : MonoBehaviour
         rb.velocity = new Vector2(
             Mathf.Clamp(rb.velocity.x, -maxHorizontalSpeed, maxHorizontalSpeed),
             rb.velocity.y);
+
+        // Mark player as moving in this frame:
         isMoving = true;
     }
 
@@ -77,16 +84,15 @@ public class PlayerController : MonoBehaviour
 
     private void Jump()
     {
-        // Ray origin:
+        // Ray origin (set to bottom of player's box collider):
         Vector2 o = new Vector2(boxCollider.transform.position.x, boxCollider.transform.position.y)
-            + new Vector2(-boxCollider.size.y, 0.0f);
+            + new Vector2(0.0f, -boxCollider.size.y / 2.0f);
         const float rayLength = 0.1f;
         
         // Prevent player from jumping if they aren't on the ground:
         if (Physics2D.Raycast(o, Vector2.down, rayLength))
-        {
-            rb.velocity = new Vector2(rb.velocity.x, 5.0f);
-        }
+            rb.velocity = new Vector2(rb.velocity.x, jumpHeight * jumpStrength);
+
         Debug.DrawLine(o, o + Vector2.down * rayLength, Color.green, 0.25f);
     }
 

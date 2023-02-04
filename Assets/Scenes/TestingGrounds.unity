@@ -365,7 +365,7 @@ GameObject:
   - component: {fileID: 699529323}
   - component: {fileID: 699529326}
   - component: {fileID: 699529325}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -502,6 +502,7 @@ MonoBehaviour:
   decelRate: 1
   maxHorizontalSpeed: 3
   horiSpeedDeadZone: 0.1
+  jumpStrength: 1
 --- !u!1 &1774431804
 GameObject:
   m_ObjectHideFlags: 0
