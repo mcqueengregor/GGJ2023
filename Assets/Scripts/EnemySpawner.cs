@@ -15,6 +15,9 @@ public class EnemySpawner : MonoBehaviour
 
     public float MaxEnemScreen = 1;
     public float MaxSameSpawnLimit = 1;
+    public float SpawnTimer = 2;
+    public float MaxTime = 5;
+    public float MinTime = 1;
 
     public bool Spawned = false;
 
@@ -39,6 +42,7 @@ public class EnemySpawner : MonoBehaviour
         print("done");
         var SpawnPosition = new Vector3(Random.Range(AreaSpawn1.position.x, AreaSpawn2.position.x), Random.Range(AreaSpawn1.position.y, AreaSpawn2.position.y), Random.Range(AreaSpawn1.position.z, AreaSpawn2.position.z));
         GameObject Clone = Instantiate(Enemy, SpawnPosition, Quaternion.identity);
-        Invoke("SpawnEnem", 2.0f);
+        SpawnTimer = Random.Range(MinTime, MaxTime);
+        Invoke("SpawnEnem", SpawnTimer);
     }
 }
