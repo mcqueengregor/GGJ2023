@@ -43,6 +43,7 @@ public class PlayerController : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private Camera mainCam;
     private Vector2 originalPos;
+    private Animator animator;
 
     private bool isMoving = false;  // 'true' if user is pressing A or S
                                     // to move left or right, 'false' otherwise.
@@ -62,6 +63,7 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         boxCollider = GetComponent<BoxCollider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        animator = GetComponent<Animator>();
 
         mainCam = Camera.main;
         originalPos = transform.position;
@@ -130,6 +132,9 @@ public class PlayerController : MonoBehaviour
             ChangePlayerState(PlayerState.FALLING);
             rb.gravityScale = gravityStrength;
         }
+        // If player was previously falling but has now landed, reset state:
+        else if (playerState == PlayerState.FALLING)
+            ChangePlayerState(PlayerState.IDLE);
     }
 
     private void MovePlayer(float horiVelocityChange)
@@ -212,7 +217,34 @@ public class PlayerController : MonoBehaviour
         {
             playerState = newState;
             Debug.Log("Changed " + name + "'s state to " + playerState + "!");
-            
+
+            switch (playerState)
+            {
+                case PlayerState.IDLE:
+                    animator.SetBool("isFalling", false);           // Handles FALL -> IDLE
+                    animator.SetBool("currentlyRecoiling", false);  // Handles HIT -> IDLE
+                    animator.SetBool("isMoving", false);            // Handles RUN -> IDLE
+                    break;
+                case PlayerState.MOVING:
+                    animator.SetBool("isMoving", true);
+                    animator.SetBool("isFalling", false);
+                    animator.SetBool("isJumping", false);
+                    break;
+                case PlayerState.JUMPING:
+                    animator.SetBool("isJumping", true);
+                    break;
+                case PlayerState.FALLING:
+                    animator.SetBool("isFalling", true);
+                    animator.SetBool("isJumping", false);
+                    break;
+                case PlayerState.RECOIL:
+                    animator.SetBool("currentlyRecoiling", true);
+                    break;
+                default:
+                    Debug.LogWarning("Switch statement shouldn't have reached this point :thonk:");
+                    break;
+            }
+
             // TODO: Switch active sprite animation here!
         }
     }
