@@ -120,8 +120,6 @@ public class PlayerController : MonoBehaviour
         // incredibly fast in the other direction, be careful!
         rb.velocity += new Vector2(beltPush, 0.0f);
 
-        Debug.Log("After belt push: " + rb.velocity);
-
         // Jump logic (blocked if recoiling):
         if (Input.GetKeyDown(KeyCode.Space))
             Jump();
@@ -142,17 +140,14 @@ public class PlayerController : MonoBehaviour
         {
             float epsilon = horiVelocityChange > 0f ? beltEpsilon : -beltEpsilon;
             horiVelocityChange += epsilon;
-            Debug.Log("New change: " + horiVelocityChange);
         }
 
         rb.velocity += new Vector2(horiVelocityChange, 0.0f);
 
         // Prevent player's speed from exceeding max value:
         rb.velocity = new Vector2(
-        Mathf.Clamp(rb.velocity.x, -maxHorizontalSpeed, maxHorizontalSpeed),
-        rb.velocity.y);
-
-        Debug.Log("After move: " + rb.velocity);
+            Mathf.Clamp(rb.velocity.x, -maxHorizontalSpeed, maxHorizontalSpeed),
+            rb.velocity.y);
 
         // Mark player as moving in this frame:
         isMoving = true;
