@@ -21,7 +21,7 @@ public class ProgressBar : MonoBehaviour
     void Start()
     {
         //testing for increment
-        IncrementProgress(0.95f);
+        //IncrementProgress(0.95f);
     }
 
     // Update is called once per frame
@@ -32,6 +32,7 @@ public class ProgressBar : MonoBehaviour
             //fill the progress bar over time until it reaches the target progress
             slider.value += FillSpeed * Time.deltaTime;
         }
+
     }
 
     public void IncrementProgress(float newProgress)
@@ -39,5 +40,10 @@ public class ProgressBar : MonoBehaviour
         //set target progress to player's position in scene
         //set the progress bar fill to increase overtime 
         targetProgress = slider.value + newProgress;
+    }
+
+    public void ReduceProgress(float newProgress)
+    {
+        targetProgress = slider.value - newProgress;
     }
 }

@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class MainMenu : MonoBehaviour
 {
-    public static bool gameIsPaused = false;
+    public static bool gameIsPaused = true;
     public GameObject PauseMenuUI;
 
     public static float musicVolume {get; private set;}
     public static float soundVolume {get; private set;}
-
+    
     // Update is called once per frame
     void Update()
     {
@@ -52,6 +52,7 @@ public class MainMenu : MonoBehaviour
     {
         //Chanages from the Main menu to start the game
         Debug.Log("Start has been selected.");
+        Time.timeScale = 1f;
     }
 
         //change volume for music on slider value change
