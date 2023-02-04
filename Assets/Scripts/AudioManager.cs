@@ -10,16 +10,12 @@ public class AudioManager: MonoBehaviour
     public static AudioManager instance = null;
 
     //Clip arrays to call specific music and sounds from
-    public AudioClip[] musicList;
-    public AudioClip[] sfxList;
+    //public AudioClip[] musicList;
+    //public AudioClip[] sfxList;
 
     //change to the volumes of music and sound
     public AudioMixerGroup musicMixerGroup;
     public AudioMixerGroup soundMixerGroup;
-
-    //audio sources
-    public AudioSource musicSource;
-    public AudioSource soundSource;
 
     // Initialize the singleton instance.
 	private void Awake()
@@ -34,6 +30,7 @@ public class AudioManager: MonoBehaviour
 			Destroy(gameObject);
             return;
 		}
+
 		//Set AudioManager to DontDestroyOnLoad so that it won't be destroyed when reloading our scene.
 		DontDestroyOnLoad(gameObject);
 	}
@@ -45,10 +42,11 @@ public class AudioManager: MonoBehaviour
         if(sound == null) //does sound not exist or incorrect call
         {
             Debug.Log("SoundFX Source cannot be found.");
+            return;
         }
         else
         {
-		    soundSource.Play();
+		    sound.Play();
         }
 	}
 	// Play a single clip through the music source.
@@ -58,15 +56,16 @@ public class AudioManager: MonoBehaviour
         if(music == null) //does music not exist or incorrect call
         {
             Debug.Log("Music Source cannot be found.");
+            return;
         }
         else
         {
             //musicSource.clip = music;
-		    musicSource.Play();
+		    music.Play();
         }
 	}
 
-    private void Start()
+    public void Start()
     {
        //play music on start
     }
@@ -77,5 +76,5 @@ public class AudioManager: MonoBehaviour
         musicMixerGroup.audioMixer.SetFloat("MusicMixerVolume", Mathf.Log10(MainMenu.musicVolume) * 20);
         soundMixerGroup.audioMixer.SetFloat("SoundMixerVolume", Mathf.Log10(MainMenu.soundVolume) * 20);
     }
-    
+
 }
