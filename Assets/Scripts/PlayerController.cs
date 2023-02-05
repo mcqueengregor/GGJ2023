@@ -16,8 +16,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] [Range(0.0f, 1.0f)] 
     private float horiSpeedDeadZone = 0.1f; // Quickly stop player from moving if their speed is
                                             // between this range (prevents jittering while stationary).
+    [HideInInspector]
     public float beltPush = 0.0f;           // How much the player is being pushed by a conveyor belt
                                             // (adjusted by external conveyor belt script).
+    const float beltEpsilon = 0.1f;         // Used if beltPush ~= accelRate, so that the player can
+                                            // eventually overpower the belt they're moving on.
 
     [Header("Jumping:")]
     [SerializeField]
@@ -40,6 +43,7 @@ public class PlayerController : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private Camera mainCam;
     private Vector2 originalPos;
+    private Animator animator;
 
     private bool isMoving = false;  // 'true' if user is pressing A or S
                                     // to move left or right, 'false' otherwise.
@@ -59,6 +63,7 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         boxCollider = GetComponent<BoxCollider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        animator = GetComponent<Animator>();
 
         mainCam = Camera.main;
         originalPos = transform.position;
@@ -75,13 +80,14 @@ public class PlayerController : MonoBehaviour
         {
             ChangePlayerState(PlayerState.IDLE);
             rb.velocity = Vector2.zero;
-            transform.position = originalPos;
+            transform.position = new Vector3(mainCam.transform.position.x, originalPos.y);
+            gameObject.GetComponent<PlayerHealth>().DamagePlayer(1);
         }
 
         // Make camera follow the player:
-        Vector3 newCamPos = mainCam.transform.position;
-        newCamPos.x = transform.position.x;
-        mainCam.transform.position = newCamPos;
+        //Vector3 newCamPos = mainCam.transform.position;
+        //newCamPos.x = transform.position.x;
+        //mainCam.transform.position = newCamPos;
 
         // If player is recoiling, check if they should stop:
         if (playerState == PlayerState.RECOIL)
@@ -112,6 +118,11 @@ public class PlayerController : MonoBehaviour
         if (!isMoving)
             DeceleratePlayer();
 
+        // Take the conveyor belt's influence on the player into account:
+        // NOTE: This could make the player unable to move in one direction and
+        // incredibly fast in the other direction, be careful!
+        rb.velocity += new Vector2(beltPush, 0.0f);
+
         // Jump logic (blocked if recoiling):
         if (Input.GetKeyDown(KeyCode.Space))
             Jump();
@@ -122,12 +133,23 @@ public class PlayerController : MonoBehaviour
             ChangePlayerState(PlayerState.FALLING);
             rb.gravityScale = gravityStrength;
         }
+        // If player was previously falling but has now landed, reset state:
+        else if (playerState == PlayerState.FALLING)
+            ChangePlayerState(PlayerState.IDLE);
     }
 
     private void MovePlayer(float horiVelocityChange)
     {
+        // If beltPush and horiVelocity change are close enough to equal, make
+        // horiVelocityChange a little higher so that player can outrun belt:
+        if (FloatEqual(beltPush, -horiVelocityChange, 0.1f))
+        {
+            float epsilon = horiVelocityChange > 0f ? beltEpsilon : -beltEpsilon;
+            horiVelocityChange += epsilon;
+        }
+
         rb.velocity += new Vector2(horiVelocityChange, 0.0f);
-        
+
         // Prevent player's speed from exceeding max value:
         rb.velocity = new Vector2(
             Mathf.Clamp(rb.velocity.x, -maxHorizontalSpeed, maxHorizontalSpeed),
@@ -136,6 +158,9 @@ public class PlayerController : MonoBehaviour
         // Mark player as moving in this frame:
         isMoving = true;
         ChangePlayerState(PlayerState.MOVING);
+
+        // Flip rabbit sprite to face the right way:
+        spriteRenderer.flipX = horiVelocityChange < 0f;
     }
 
     private void DeceleratePlayer()
@@ -143,6 +168,9 @@ public class PlayerController : MonoBehaviour
         // Only decelerate player if they're actually moving, otherwise early-out:
         if (FloatWithinRange(rb.velocity.x, -horiSpeedDeadZone, horiSpeedDeadZone))
         {
+            if (!FloatEqual(beltPush, 0.0f))
+                rb.velocity = new Vector2(0.0f, rb.velocity.y);
+
             // If player isn't jumping, falling or recoiling, update state to IDLE:
             if (playerState == PlayerState.MOVING)
                 ChangePlayerState(PlayerState.IDLE);
@@ -193,15 +221,40 @@ public class PlayerController : MonoBehaviour
         {
             playerState = newState;
             Debug.Log("Changed " + name + "'s state to " + playerState + "!");
-            
-            // TODO: Switch active sprite animation here!
+
+            switch (playerState)
+            {
+                case PlayerState.IDLE:
+                    animator.SetBool("isFalling", false);           // Handles FALL -> IDLE
+                    animator.SetBool("currentlyRecoiling", false);  // Handles HIT -> IDLE
+                    animator.SetBool("isMoving", false);            // Handles RUN -> IDLE
+                    break;
+                case PlayerState.MOVING:
+                    animator.SetBool("isMoving", true);
+                    animator.SetBool("isFalling", false);
+                    animator.SetBool("isJumping", false);
+                    break;
+                case PlayerState.JUMPING:
+                    animator.SetBool("isJumping", true);
+                    break;
+                case PlayerState.FALLING:
+                    animator.SetBool("isFalling", true);
+                    animator.SetBool("isJumping", false);
+                    break;
+                case PlayerState.RECOIL:
+                    animator.SetBool("currentlyRecoiling", true);
+                    break;
+                default:
+                    Debug.LogWarning("Switch statement shouldn't have reached this point :thonk:");
+                    break;
+            }
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         // If player collides with an enemy, make player recoil:
-        if (collision.gameObject.CompareTag("EnemyObject"))
+        if (collision.gameObject.CompareTag("Enemy"))
         {
             ChangePlayerState(PlayerState.RECOIL);
             recoilTimer = 0.0f;
