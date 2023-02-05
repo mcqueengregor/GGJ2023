@@ -1,13 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//using UnityEngine.SceneManagement;
+using UnityEngine.SceneManagement;
+using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
     public static bool gameIsPaused = false;
     public GameObject PauseMenuUI;
     public GameObject Player;
+    public GameObject DeathScreen;
+    public GameObject HealthBar;
 
     public static float musicVolume {get; private set;}
     public static float soundVolume {get; private set;}
@@ -18,6 +21,7 @@ public class MainMenu : MonoBehaviour
         Player.GetComponent<PlayerController>().enabled = false;
         Time.timeScale = 0;
         Cursor.visible = true;
+        HealthBar.SetActive(false);
     }
 
 
@@ -36,6 +40,11 @@ public class MainMenu : MonoBehaviour
                 Pause();
             }
         }
+
+        if (Player.GetComponent<PlayerHealth>().CurrentHea == 0)
+        {
+            Death();
+        }
     }
 
     public void Resume()
@@ -45,6 +54,7 @@ public class MainMenu : MonoBehaviour
         gameIsPaused = false;
         Cursor.visible = false;
         Player.GetComponent<PlayerController>().enabled = true;
+        HealthBar.SetActive(true);
     }
 
     public void Pause()
@@ -54,6 +64,7 @@ public class MainMenu : MonoBehaviour
         gameIsPaused = true;
         Player.GetComponent<PlayerController>().enabled = false;
         Cursor.visible = true;
+        HealthBar.SetActive(false);
     }
 
     public void ExitGame()
@@ -70,6 +81,7 @@ public class MainMenu : MonoBehaviour
         Time.timeScale = 1f;
         Cursor.visible = false;
         Player.GetComponent<PlayerController>().enabled = true;
+        HealthBar.SetActive(true);
     }
 
         //change volume for music on slider value change
@@ -83,5 +95,21 @@ public class MainMenu : MonoBehaviour
     public void onSoundSliderVolumeChange(float value)
     {
         soundVolume = value;
+    }
+
+    public void Death()
+    {
+        DeathScreen.SetActive(true);
+        Time.timeScale = 0f;
+        Player.GetComponent<PlayerController>().enabled = false;
+        Cursor.visible = true;
+        HealthBar.SetActive(false);
+
+    }
+
+    public void Reset()
+    {
+        SceneManager.LoadScene("TestingGrounds");
+        print("DeathScreen");
     }
 }
