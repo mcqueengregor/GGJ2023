@@ -902,7 +902,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &4199929891923412360
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2204,7 +2204,7 @@ RectTransform:
   - {fileID: 7673207854854674445}
   - {fileID: 526630680127427255}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -3471,9 +3471,9 @@ MonoBehaviour:
   m_HandleRect: {fileID: 0}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 1
+  m_MaxValue: 129
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 127
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -3489,8 +3489,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04d102a092874d34b8d66ae13dd386d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  FillSpeed: 0.1
-  targetProgress: 0
+  camObject: {fileID: 0}
+  endPosition: {fileID: 0}
 --- !u!1 &4199929892983428084
 GameObject:
   m_ObjectHideFlags: 0
@@ -4760,7 +4760,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 3.1645966, y: 0}
+  m_AnchoredPosition: {x: 3.1645508, y: 0}
   m_SizeDelta: {x: 16.3291, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4199929893503680138
