@@ -7,9 +7,20 @@ public class MainMenu : MonoBehaviour
 {
     public static bool gameIsPaused = false;
     public GameObject PauseMenuUI;
+    public GameObject Player;
 
     public static float musicVolume {get; private set;}
     public static float soundVolume {get; private set;}
+
+    private void Start()
+    {
+        Player = GameObject.FindGameObjectWithTag("Player");
+        Player.GetComponent<PlayerController>().enabled = false;
+        Time.timeScale = 0;
+        Cursor.visible = true;
+    }
+
+
 
     // Update is called once per frame
     void Update()
@@ -32,6 +43,8 @@ public class MainMenu : MonoBehaviour
         PauseMenuUI.SetActive(false);
         Time.timeScale = 1f;
         gameIsPaused = false;
+        Cursor.visible = false;
+        Player.GetComponent<PlayerController>().enabled = true;
     }
 
     public void Pause()
@@ -39,6 +52,8 @@ public class MainMenu : MonoBehaviour
         PauseMenuUI.SetActive(true);
         Time.timeScale = 0f;
         gameIsPaused = true;
+        Player.GetComponent<PlayerController>().enabled = false;
+        Cursor.visible = true;
     }
 
     public void ExitGame()
@@ -52,6 +67,9 @@ public class MainMenu : MonoBehaviour
     {
         //Chanages from the Main menu to start the game
         Debug.Log("Start has been selected.");
+        Time.timeScale = 1f;
+        Cursor.visible = false;
+        Player.GetComponent<PlayerController>().enabled = true;
     }
 
         //change volume for music on slider value change
