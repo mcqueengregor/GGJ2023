@@ -8,8 +8,9 @@ public class PlayerHealth : MonoBehaviour
     [Header("Health Setup")]
     public int CurrentHea;
     public int MaxHea;
-    
 
+    public GameObject HealthUIObject;
+    public HealthUI HealthBar;
     
 
     [Header("Player Invincibility")]
@@ -26,6 +27,10 @@ public class PlayerHealth : MonoBehaviour
     {
         CurrentHea = MaxHea;
         SpRend = gameObject.GetComponent<SpriteRenderer>();
+        //HealthUIObject = ;
+        HealthBar = GameObject.FindGameObjectWithTag("HealthUI").GetComponent<HealthUI>();
+        print(HealthUIObject);
+        HealthBar.MAXHealth(MaxHea);
     }
 
     // Update is called once per frame
@@ -60,6 +65,7 @@ public class PlayerHealth : MonoBehaviour
             PlayerHurt = true;
             StartCoroutine(Invulnerable());
             CurrentHea = CurrentHea - Hit;
+            HealthBar.SliderValue(CurrentHea);
         }
     }
 
