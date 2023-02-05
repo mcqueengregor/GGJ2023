@@ -92,7 +92,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: f2b5fb969c45d344fbae95825b448884, type: 3}
   - {fileID: 21300000, guid: 3c18ac4929b748a47a3a335faf715b7e, type: 3}
   - {fileID: 21300000, guid: 2ee9aa5922ca64b449fb1f488e6b01cd, type: 3}
-  Speed: 0.5
+  Speed: 2
 --- !u!61 &4044242651702896191
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -196,4 +196,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39d6bd87ddc9c104ea9dfcd89dfbb565, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RotSpeed: 1000
+  RotSpeed: 10
