@@ -6,7 +6,8 @@ public class RotationScript : MonoBehaviour
 {
 
     [Header("Control Rotation Speed")]
-    public float RotSpeed = 3;
+    public float RotSpeedMAX = 3;
+    public float RotSpeedMIN
 
     // Start is called before the first frame update
     void Start()
@@ -17,6 +18,6 @@ public class RotationScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.Rotate(0, 0, 6 * RotSpeed * Time.deltaTime);
+        transform.Rotate(0, 0, 6 * Random.Range(RotSpeedMIN, RotSpeedMAX) * Time.deltaTime);
     }
 }
