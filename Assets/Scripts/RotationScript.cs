@@ -7,7 +7,7 @@ public class RotationScript : MonoBehaviour
 
     [Header("Control Rotation Speed")]
     public float RotSpeedMAX = 3;
-    public float RotSpeedMIN
+    public float RotSpeedMIN = 1;
 
     // Start is called before the first frame update
     void Start()
