@@ -19,19 +19,28 @@ public class UpAndDownMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if ((Index + 1) > Pos.Length)
+        {
+            Index = 0;
+        }
+        print(Pos.Length);
+
+
+        print(Index);
+
+
         if (gameObject.transform.position == Pos[Index].transform.position)
         {
             Index++;
         }
 
-        if (Index > Pos.Length)
-        {
-            Index = 0;
-        }
+
 
         if (Index <= Pos.Length)
         {
             transform.position = Vector3.MoveTowards(transform.position, Pos[Index].transform.position, (ObjSpeed * Time.deltaTime));
         }
+
+
     }
 }

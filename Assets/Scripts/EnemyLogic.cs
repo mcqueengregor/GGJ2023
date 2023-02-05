@@ -10,7 +10,8 @@ public class EnemyLogic : MonoBehaviour
     public Sprite[] Sprites;
 
     [Header("Speed")]
-    public float Speed = 2;
+    public float SpeedMax = 2;
+    public float SpeedMIN = 1;
 
     private Vector3 StartTarg;
     private Vector3 EndTarg;
@@ -41,7 +42,7 @@ public class EnemyLogic : MonoBehaviour
         EndTarg = new Vector3(Random.Range(Target1.transform.position.x, Target2.transform.position.x), StartTarg.y, Random.Range(Target1.transform.position.z, Target2.transform.position.z));
 
         //transform.LookAt(EndTarg);
-        transform.position = Vector3.MoveTowards(transform.position, EndTarg, (Speed * Time.deltaTime));
+        transform.position = Vector3.MoveTowards(transform.position, EndTarg, (Random.Range(SpeedMIN, SpeedMax) * Time.deltaTime));
 
         if(gameObject.transform.position == EndTarg)
         {
