@@ -10,11 +10,13 @@ public class MainMenu : MonoBehaviour
     public GameObject PauseMenuUI;
     public GameObject Player;
     public GameObject DeathScreen;
+    public GameObject WinScreen;
     public GameObject HealthBar;
     public GameObject Progress;
 
     public static float musicVolume {get; private set;}
     public static float soundVolume {get; private set;}
+    private bool Started = false;
 
     private void Start()
     {
@@ -22,8 +24,8 @@ public class MainMenu : MonoBehaviour
         Player.GetComponent<PlayerController>().enabled = false;
         Time.timeScale = 0;
         Cursor.visible = true;
-        HealthBar.SetActive(false);
-        Progress.SetActive(false); 
+        //HealthBar.SetActive(false);
+        //Progress.SetActive(false); 
     }
 
 
@@ -43,9 +45,14 @@ public class MainMenu : MonoBehaviour
             }
         }
 
-        if (Player.GetComponent<PlayerHealth>().CurrentHea == 0)
+        if (Player.GetComponent<PlayerHealth>().CurrentHea <= 0)
         {
             Death();
+        }
+
+        if (Progress.GetComponent<ProgressBar>().slider.value == Progress.GetComponent<ProgressBar>().maxDistance && Started == true)
+        {
+            Win();
         }
     }
 
@@ -87,6 +94,7 @@ public class MainMenu : MonoBehaviour
         Player.GetComponent<PlayerController>().enabled = true;
         HealthBar.SetActive(true);
         Progress.SetActive(true);
+        Started = true;
     }
 
         //change volume for music on slider value change
@@ -116,5 +124,15 @@ public class MainMenu : MonoBehaviour
     {
         SceneManager.LoadScene("TestingGrounds");
         print("DeathScreen");
+    }
+
+    public void Win()
+    {
+        WinScreen.SetActive(true);
+        Time.timeScale = 0f;
+        Player.GetComponent<PlayerController>().enabled = false;
+        Cursor.visible = true;
+        HealthBar.SetActive(false);
+        Progress.SetActive(false);
     }
 }

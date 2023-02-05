@@ -8,10 +8,10 @@ public class ProgressBar : MonoBehaviour
     //how fast the progress bar fills
     //public float FillSpeed = 0.2f;
     //What value the progress bar will stop at
-    private float targetProgress = 0;
-    private float maxDistance;
+    public float targetProgress = 0;
+    public float maxDistance;
     //slider for value changes
-    private Slider slider;
+    public Slider slider;
     public Camera camObject;
     public GameObject endPosition;
     

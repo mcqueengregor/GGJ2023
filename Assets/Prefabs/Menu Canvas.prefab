@@ -2195,16 +2195,16 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 4199929893724137034}
   - {fileID: 4199929891923412360}
   - {fileID: 4199929891908393715}
   - {fileID: 4199929892194233326}
   - {fileID: 4199929892948320422}
-  - {fileID: 4199929893724137034}
   - {fileID: 1684037173}
   - {fileID: 7673207854854674445}
   - {fileID: 526630680127427255}
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -2288,6 +2288,7 @@ MonoBehaviour:
   PauseMenuUI: {fileID: 4199929892194233321}
   Player: {fileID: 0}
   DeathScreen: {fileID: 2497772768072997924}
+  WinScreen: {fileID: 0}
   HealthBar: {fileID: 4199929893724137045}
   Progress: {fileID: 4199929892948320417}
 --- !u!1 &4199929892432421015
@@ -3489,6 +3490,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04d102a092874d34b8d66ae13dd386d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  targetProgress: 0
+  maxDistance: 0
+  slider: {fileID: 0}
   camObject: {fileID: 0}
   endPosition: {fileID: 0}
 --- !u!1 &4199929892983428084
