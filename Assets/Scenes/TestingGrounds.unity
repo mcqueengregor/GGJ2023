@@ -2114,7 +2114,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 325745415}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 55440721c6f00e14689c35b3da40aa8d, type: 3}
   m_Name: 
@@ -2127,7 +2127,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 325745415}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 1
@@ -2471,7 +2471,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5318811208853232751, guid: 14f61e2eae1fbcb4eb162184eaf9bd2a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5318811208853232751, guid: 14f61e2eae1fbcb4eb162184eaf9bd2a, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2511,11 +2511,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5318811209585584437, guid: 14f61e2eae1fbcb4eb162184eaf9bd2a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5318811209585584437, guid: 14f61e2eae1fbcb4eb162184eaf9bd2a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.25
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 5318811209585584437, guid: 14f61e2eae1fbcb4eb162184eaf9bd2a, type: 3}
       propertyPath: m_LocalPosition.z
