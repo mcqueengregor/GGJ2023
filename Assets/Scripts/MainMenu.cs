@@ -11,6 +11,7 @@ public class MainMenu : MonoBehaviour
     public GameObject Player;
     public GameObject DeathScreen;
     public GameObject HealthBar;
+    public GameObject Progress;
 
     public static float musicVolume {get; private set;}
     public static float soundVolume {get; private set;}
@@ -22,6 +23,7 @@ public class MainMenu : MonoBehaviour
         Time.timeScale = 0;
         Cursor.visible = true;
         HealthBar.SetActive(false);
+        Progress.SetActive(false); 
     }
 
 
@@ -55,6 +57,7 @@ public class MainMenu : MonoBehaviour
         Cursor.visible = false;
         Player.GetComponent<PlayerController>().enabled = true;
         HealthBar.SetActive(true);
+        Progress.SetActive(true);
     }
 
     public void Pause()
@@ -65,6 +68,7 @@ public class MainMenu : MonoBehaviour
         Player.GetComponent<PlayerController>().enabled = false;
         Cursor.visible = true;
         HealthBar.SetActive(false);
+        Progress.SetActive(false);
     }
 
     public void ExitGame()
@@ -82,6 +86,7 @@ public class MainMenu : MonoBehaviour
         Cursor.visible = false;
         Player.GetComponent<PlayerController>().enabled = true;
         HealthBar.SetActive(true);
+        Progress.SetActive(true);
     }
 
         //change volume for music on slider value change
@@ -104,7 +109,7 @@ public class MainMenu : MonoBehaviour
         Player.GetComponent<PlayerController>().enabled = false;
         Cursor.visible = true;
         HealthBar.SetActive(false);
-
+        Progress.SetActive(false);
     }
 
     public void Reset()
